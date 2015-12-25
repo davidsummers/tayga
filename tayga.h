@@ -31,13 +31,47 @@
 #include <syslog.h>
 #include <errno.h>
 #include <time.h>
+#ifdef __Linux__
 #include <linux/if.h>
 #include <linux/if_tun.h>
 #include <linux/if_ether.h>
+#endif
+#if (__FreeBSD__ == 1) || ((__APPLE__ == 1) && (__MACH__ == 1))
+#include <net/if.h>
+#if ((__APPLE__ == 1) && (__MACH__ == 1))
+#include <net/if_utun.h>
+#else // ! APPLE MACH
+#include <net/if_tun.h>
+#endif // APPLE MACH
+#include <netinet/if_ether.h>
+#include <net/ethernet.h>
+#include <sys/uio.h>
+#endif
+
 
 #include "list.h"
 #include "config.h"
 
+
+#ifdef __Linux__
+#define	TUN_SET_PROTO(_pi, _af)			{ (_pi)->flags = 0; (_pi)->proto = htons(_af); }
+#define	TUN_GET_PROTO(_pi)			ntohs((_pi)->proto)
+#endif
+
+#if (__FreeBSD__ == 1) || ((__APPLE__ == 1) && (__MACH__ == 1))
+#define s6_addr8  __u6_addr.__u6_addr8
+#define s6_addr16 __u6_addr.__u6_addr16
+#define s6_addr32 __u6_addr.__u6_addr32
+
+struct tun_pi {
+	int	proto;
+};
+
+#define ETH_P_IP AF_INET
+#define	ETH_P_IPV6 AF_INET6
+#define	TUN_SET_PROTO(_pi, _af)			{ (_pi)->proto = htonl(_af); }
+#define	TUN_GET_PROTO(_pi)			ntohl((_pi)->proto)
+#endif
 
 /* Configuration knobs */
 
