@@ -54,11 +54,11 @@ static struct map_static *alloc_map_static(int ln)
 	m->map4.type = MAP_TYPE_STATIC;
 	m->map4.prefix_len = 32;
 	calc_ip4_mask(&m->map4.mask, NULL, 32);
-	INIT_LIST_HEAD(&m->map4.list);
+	T_INIT_LIST_HEAD(&m->map4.list);
 	m->map6.type = MAP_TYPE_STATIC;
 	m->map6.prefix_len = 128;
 	calc_ip6_mask(&m->map6.mask, NULL, 128);
-	INIT_LIST_HEAD(&m->map6.list);
+	T_INIT_LIST_HEAD(&m->map6.list);
 	m->conffile_lineno = ln;
 	return m;
 }
@@ -267,13 +267,13 @@ static void config_dynamic_pool(int ln, int arg_count, char **args)
 		exit(1);
 	}
 	memset(pool, 0, sizeof(struct dynamic_pool));
-	INIT_LIST_HEAD(&pool->mapped_list);
-	INIT_LIST_HEAD(&pool->dormant_list);
-	INIT_LIST_HEAD(&pool->free_list);
+	T_INIT_LIST_HEAD(&pool->mapped_list);
+	T_INIT_LIST_HEAD(&pool->dormant_list);
+	T_INIT_LIST_HEAD(&pool->free_list);
 
 	m4 = &pool->map4;
 	m4->type = MAP_TYPE_DYNAMIC_POOL;
-	INIT_LIST_HEAD(&m4->list);
+	T_INIT_LIST_HEAD(&m4->list);
 
 	if (parse_prefix(AF_INET, args[0], &m4->addr, &m4->prefix_len) ||
 			calc_ip4_mask(&m4->mask, &m4->addr, m4->prefix_len)) {
@@ -297,7 +297,7 @@ static void config_dynamic_pool(int ln, int arg_count, char **args)
 
 	pool->free_head.addr = ntohl(m4->addr.s_addr);
 	pool->free_head.count = (1 << (32 - m4->prefix_len)) - 1;
-	INIT_LIST_HEAD(&pool->free_head.list);
+	T_INIT_LIST_HEAD(&pool->free_head.list);
 	list_add(&pool->free_head.list, &pool->free_list);
 
 	gcfg->dynamic_pool = pool;
@@ -368,8 +368,8 @@ void read_config(char *conffile)
 		goto malloc_fail;
 	memset(gcfg, 0, sizeof(struct config));
 	gcfg->recv_buf_size = 65536 + sizeof(struct tun_pi);
-	INIT_LIST_HEAD(&gcfg->map4_list);
-	INIT_LIST_HEAD(&gcfg->map6_list);
+	T_INIT_LIST_HEAD(&gcfg->map4_list);
+	T_INIT_LIST_HEAD(&gcfg->map6_list);
 	gcfg->dyn_min_lease = 7200 + 4 * 60; /* just over two hours */
 	gcfg->dyn_max_lease = 14 * 86400;
 	gcfg->max_commit_delay = gcfg->dyn_max_lease / 4;
@@ -378,8 +378,8 @@ void read_config(char *conffile)
 	gcfg->allow_ident_gen = 1;
 	gcfg->ipv6_offlink_mtu = 1280;
 	gcfg->lazy_frag_hdr = 1;
-	INIT_LIST_HEAD(&gcfg->cache_pool);
-	INIT_LIST_HEAD(&gcfg->cache_active);
+	T_INIT_LIST_HEAD(&gcfg->cache_pool);
+	T_INIT_LIST_HEAD(&gcfg->cache_active);
 
 	in = fopen(conffile, "r");
 	if (!in) {

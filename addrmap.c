@@ -189,24 +189,24 @@ void create_cache(void)
 		exit(1);
 	}
 	for (i = 0; i < hash_size; ++i) {
-		INIT_LIST_HEAD(&gcfg->hash_table4[i]);
-		INIT_LIST_HEAD(&gcfg->hash_table6[i]);
+		T_INIT_LIST_HEAD(&gcfg->hash_table4[i]);
+		T_INIT_LIST_HEAD(&gcfg->hash_table6[i]);
 	}
 
 	if (list_empty(&gcfg->cache_pool) && list_empty(&gcfg->cache_active)) {
 		c = calloc(gcfg->cache_size, sizeof(struct cache_entry));
 		for (i = 0; i < gcfg->cache_size; ++i) {
-			INIT_LIST_HEAD(&c->list);
-			INIT_LIST_HEAD(&c->hash4);
-			INIT_LIST_HEAD(&c->hash6);
+			T_INIT_LIST_HEAD(&c->list);
+			T_INIT_LIST_HEAD(&c->hash4);
+			T_INIT_LIST_HEAD(&c->hash6);
 			list_add_tail(&c->list, &gcfg->cache_pool);
 			++c;
 		}
 	} else {
 		list_for_each(entry, &gcfg->cache_active) {
 			c = list_entry(entry, struct cache_entry, list);
-			INIT_LIST_HEAD(&c->hash4);
-			INIT_LIST_HEAD(&c->hash6);
+			T_INIT_LIST_HEAD(&c->hash4);
+			T_INIT_LIST_HEAD(&c->hash6);
 			add_to_hash_table(c, hash_ip4(&c->addr4),
 						hash_ip6(&c->addr6));
 		}
